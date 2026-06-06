@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wavo — Projects</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #f7f7f8; --surface: #fff; --border: #ebebeb; --text: #1a1a1a; --muted: #888; --accent: #6c63ff; --accent-light: #f0efff; --sidebar-w: 240px; --radius: 12px; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+    a { text-decoration: none; color: inherit; }
+
+    .sidebar { width: var(--sidebar-w); background: white; border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px 0; position: fixed; top: 0; bottom: 0; left: 0; z-index: 10; }
+    .sidebar-logo { padding: 4px 20px 20px; font-size: 18px; font-weight: 700; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+    .sidebar-logo span { color: var(--accent); }
+    .sidebar-section { padding: 0 12px; margin-bottom: 8px; }
+    .sidebar-label { font-size: 10px; font-weight: 600; letter-spacing: 1.2px; color: var(--muted); text-transform: uppercase; padding: 0 8px; margin-bottom: 4px; }
+    .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.15s; margin-bottom: 2px; }
+    .sidebar-item:hover { background: var(--bg); color: var(--text); }
+    .sidebar-item.active { background: var(--accent-light); color: var(--accent); }
+    .sidebar-item .icon { width: 18px; text-align: center; font-size: 14px; }
+    .sidebar-item .badge { margin-left: auto; background: var(--accent); color: white; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 999px; }
+    .sidebar-bottom { margin-top: auto; padding: 16px 12px 4px; border-top: 1px solid var(--border); }
+    .user-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; }
+    .user-avatar { width: 32px; height: 32px; background: var(--accent-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; color: var(--accent); }
+    .user-name { font-size: 13px; font-weight: 600; }
+    .user-plan { font-size: 11px; color: var(--muted); }
+
+    .main { margin-left: var(--sidebar-w); flex: 1; }
+    .topbar { background: white; border-bottom: 1px solid var(--border); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 5; }
+    .topbar-title { font-size: 16px; font-weight: 600; }
+    .btn-new { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
+
+    .content { padding: 32px; }
+    .page-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+    .page-sub { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+
+    /* NEW PROJECT CARD */
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+    .new-project-card { background: white; border: 2px dashed var(--border); border-radius: var(--radius); padding: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: all 0.2s; min-height: 180px; }
+    .new-project-card:hover { border-color: var(--accent); background: var(--accent-light); }
+    .new-icon { width: 44px; height: 44px; background: var(--bg); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; border: 1px solid var(--border); }
+    .new-label { font-size: 14px; font-weight: 600; }
+    .new-sub { font-size: 12px; color: var(--muted); }
+
+    .project-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; transition: all 0.2s; cursor: pointer; }
+    .project-card:hover { border-color: var(--accent); box-shadow: 0 4px 20px rgba(108,99,255,0.08); transform: translateY(-2px); }
+    .project-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+    .project-name { font-size: 15px; font-weight: 700; }
+    .project-more { font-size: 18px; color: var(--muted); cursor: pointer; line-height: 1; }
+    .project-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+    .project-progress { height: 4px; background: var(--bg); border-radius: 99px; margin-bottom: 14px; overflow: hidden; }
+    .project-progress-bar { height: 100%; background: var(--accent); border-radius: 99px; }
+    .project-meta { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+    .project-agents-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+    .agent-chip { font-size: 11px; background: var(--accent-light); color: var(--accent); padding: 3px 10px; border-radius: 999px; font-weight: 500; }
+    .project-footer-row { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--border); }
+    .project-date { font-size: 11px; color: var(--muted); }
+    .project-tasks-count { font-size: 12px; font-weight: 700; color: var(--accent); }
+
+    /* MODAL */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: white; border-radius: 16px; padding: 36px; width: 480px; max-width: 90vw; }
+    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+    .form-group { margin-bottom: 16px; }
+    label { font-size: 13px; font-weight: 500; display: block; margin-bottom: 6px; }
+    input, textarea, select { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit; outline: none; transition: border 0.2s; }
+    input:focus, textarea:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 80px; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 8px; justify-content: flex-end; }
+    .btn-cancel { padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 500; border: 1px solid var(--border); background: white; cursor: pointer; font-family: inherit; }
+    .btn-create { padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; border: none; background: var(--accent); color: white; cursor: pointer; font-family: inherit; }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">Wav<span>o</span></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Main</div>
+    <a href="dashboard.html"><div class="sidebar-item"><span class="icon">🏠</span> Dashboard</div></a>
+    <a href="projects.html"><div class="sidebar-item active"><span class="icon">📁</span> Projects</div></a>
+    <a href="agents.html"><div class="sidebar-item"><span class="icon">🤖</span> Agents <span class="badge">11</span></div></a>
+    <a href="pricing.html"><div class="sidebar-item"><span class="icon">💳</span> Pricing</div></a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Activity</div>
+    <div class="sidebar-item"><span class="icon">📊</span> Analytics</div>
+    <div class="sidebar-item"><span class="icon">🔔</span> Notifications <span class="badge">3</span></div>
+    <div class="sidebar-item"><span class="icon">🕓</span> Activity Log</div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Account</div>
+    <a href="settings.html"><div class="sidebar-item"><span class="icon">⚙️</span> Settings</div></a>
+    <div class="sidebar-item"><span class="icon">🆘</span> Help & Support</div>
+    <a href="index.html"><div class="sidebar-item"><span class="icon">🚪</span> Sign out</div></a>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="user-row">
+      <div class="user-avatar">A</div>
+      <div><div class="user-name">Aryan</div><div class="user-plan">Pro Plan</div></div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Projects</div>
+    <button class="btn-new" onclick="document.getElementById('newModal').classList.add('show')">+ New Project</button>
+  </div>
+
+  <div class="content">
+    <div class="page-title">All Projects</div>
+    <div class="page-sub">Organize your work. Each project can run multiple agents in parallel.</div>
+
+    <div class="projects-grid">
+      <div class="new-project-card" onclick="document.getElementById('newModal').classList.add('show')">
+        <div class="new-icon">+</div>
+        <div class="new-label">Create new project</div>
+        <div class="new-sub">Add agents and get to work</div>
+      </div>
+      <div class="project-card">
+        <div class="project-top"><div class="project-name">Product Launch Q3</div><div class="project-more">⋯</div></div>
+        <div class="project-desc">Full go-to-market campaign for the new SaaS product release in July.</div>
+        <div class="project-progress"><div class="project-progress-bar" style="width:62%"></div></div>
+        <div class="project-meta"><span>62% complete</span><span>42 tasks</span></div>
+        <div class="project-agents-row">
+          <span class="agent-chip">📣 Marketing</span><span class="agent-chip">✍️ Content</span><span class="agent-chip">🤝 Sales</span>
+        </div>
+        <div class="project-footer-row"><span class="project-date">Updated 1h ago</span><span class="project-tasks-count">42 tasks</span></div>
+      </div>
+      <div class="project-card">
+        <div class="project-top"><div class="project-name">Client Onboarding</div><div class="project-more">⋯</div></div>
+        <div class="project-desc">Automating the onboarding workflow for new consulting clients end-to-end.</div>
+        <div class="project-progress"><div class="project-progress-bar" style="width:80%"></div></div>
+        <div class="project-meta"><span>80% complete</span><span>18 tasks</span></div>
+        <div class="project-agents-row">
+          <span class="agent-chip">📅 Ops</span><span class="agent-chip">📧 Email</span><span class="agent-chip">⚖️ Legal</span>
+        </div>
+        <div class="project-footer-row"><span class="project-date">Updated 3h ago</span><span class="project-tasks-count">18 tasks</span></div>
+      </div>
+      <div class="project-card">
+        <div class="project-top"><div class="project-name">Brand Refresh</div><div class="project-more">⋯</div></div>
+        <div class="project-desc">Updating brand voice, visuals, and messaging across all channels and touchpoints.</div>
+        <div class="project-progress"><div class="project-progress-bar" style="width:35%"></div></div>
+        <div class="project-meta"><span>35% complete</span><span>9 tasks</span></div>
+        <div class="project-agents-row">
+          <span class="agent-chip">🎨 Brand</span><span class="agent-chip">✍️ Content</span>
+        </div>
+        <div class="project-footer-row"><span class="project-date">Updated yesterday</span><span class="project-tasks-count">9 tasks</span></div>
+      </div>
+      <div class="project-card">
+        <div class="project-top"><div class="project-name">Q3 Revenue Push</div><div class="project-more">⋯</div></div>
+        <div class="project-desc">Aggressive outbound sales and email campaigns targeting 50 key accounts this quarter.</div>
+        <div class="project-progress"><div class="project-progress-bar" style="width:20%"></div></div>
+        <div class="project-meta"><span>20% complete</span><span>31 tasks</span></div>
+        <div class="project-agents-row">
+          <span class="agent-chip">🤝 Sales</span><span class="agent-chip">📧 Email</span><span class="agent-chip">🔍 Research</span>
+        </div>
+        <div class="project-footer-row"><span class="project-date">Created 2 days ago</span><span class="project-tasks-count">31 tasks</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEW PROJECT MODAL -->
+<div class="modal-overlay" id="newModal">
+  <div class="modal">
+    <div class="modal-title">Create new project</div>
+    <div class="modal-sub">Give your project a name and pick which agents to activate.</div>
+    <div class="form-group">
+      <label>Project name</label>
+      <input type="text" placeholder="e.g. Q4 Marketing Push"/>
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea placeholder="What is this project about?"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Agents to activate</label>
+      <select>
+        <option>Marketing Agent</option>
+        <option>Sales Agent</option>
+        <option>Content Agent</option>
+        <option>Email Agent</option>
+        <option>Legal Agent</option>
+        <option>Finance Agent</option>
+        <option>Research Agent</option>
+        <option>Ops Agent</option>
+        <option>Brand Agent</option>
+        <option>Support Agent</option>
+        <option>Analytics Agent</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="document.getElementById('newModal').classList.remove('show')">Cancel</button>
+      <button class="btn-create" onclick="document.getElementById('newModal').classList.remove('show')">Create Project</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
