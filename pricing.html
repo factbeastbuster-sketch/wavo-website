@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wavo — Pricing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #f7f7f8; --surface: #fff; --border: #ebebeb; --text: #1a1a1a; --muted: #888; --accent: #6c63ff; --accent-light: #f0efff; --sidebar-w: 240px; --radius: 12px; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+    a { text-decoration: none; color: inherit; }
+
+    .sidebar { width: var(--sidebar-w); background: white; border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px 0; position: fixed; top: 0; bottom: 0; left: 0; z-index: 10; }
+    .sidebar-logo { padding: 4px 20px 20px; font-size: 18px; font-weight: 700; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+    .sidebar-logo span { color: var(--accent); }
+    .sidebar-section { padding: 0 12px; margin-bottom: 8px; }
+    .sidebar-label { font-size: 10px; font-weight: 600; letter-spacing: 1.2px; color: var(--muted); text-transform: uppercase; padding: 0 8px; margin-bottom: 4px; }
+    .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.15s; margin-bottom: 2px; }
+    .sidebar-item:hover { background: var(--bg); color: var(--text); }
+    .sidebar-item.active { background: var(--accent-light); color: var(--accent); }
+    .sidebar-item .icon { width: 18px; text-align: center; font-size: 14px; }
+    .sidebar-item .badge { margin-left: auto; background: var(--accent); color: white; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 999px; }
+    .sidebar-bottom { margin-top: auto; padding: 16px 12px 4px; border-top: 1px solid var(--border); }
+    .user-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; }
+    .user-avatar { width: 32px; height: 32px; background: var(--accent-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; color: var(--accent); }
+    .user-name { font-size: 13px; font-weight: 600; }
+    .user-plan { font-size: 11px; color: var(--muted); }
+
+    .main { margin-left: var(--sidebar-w); flex: 1; }
+    .topbar { background: white; border-bottom: 1px solid var(--border); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 5; }
+    .topbar-title { font-size: 16px; font-weight: 600; }
+    .current-plan { font-size: 12px; background: var(--accent-light); color: var(--accent); padding: 5px 12px; border-radius: 999px; font-weight: 600; }
+
+    .content { padding: 48px 32px; max-width: 1000px; margin: 0 auto; }
+    .page-title { font-size: 30px; font-weight: 700; letter-spacing: -1px; margin-bottom: 8px; text-align: center; }
+    .page-sub { font-size: 15px; color: var(--muted); text-align: center; margin-bottom: 48px; }
+
+    /* TOGGLE */
+    .billing-toggle { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 40px; }
+    .toggle-label { font-size: 14px; font-weight: 500; }
+    .toggle-switch { width: 46px; height: 26px; background: var(--accent); border-radius: 999px; position: relative; cursor: pointer; }
+    .toggle-switch::after { content: ''; width: 20px; height: 20px; background: white; border-radius: 50%; position: absolute; top: 3px; right: 3px; transition: all 0.2s; }
+    .save-badge { background: #dcfce7; color: #16a34a; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
+
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 48px; }
+    .pricing-card { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 32px; position: relative; }
+    .pricing-card.popular { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+    .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; font-size: 11px; font-weight: 700; padding: 4px 14px; border-radius: 999px; }
+    .plan-name { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+    .plan-price { font-size: 42px; font-weight: 700; letter-spacing: -1.5px; }
+    .plan-price .per { font-size: 14px; font-weight: 400; color: var(--muted); }
+    .plan-tagline { font-size: 13px; color: var(--muted); margin: 10px 0 24px; line-height: 1.6; }
+    .plan-btn { width: 100%; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; font-family: inherit; margin-bottom: 24px; transition: all 0.2s; }
+    .plan-btn.current { background: var(--bg); color: var(--muted); border: 1px solid var(--border); cursor: default; }
+    .plan-btn.upgrade { background: var(--accent); color: white; }
+    .plan-btn.upgrade:hover { opacity: 0.88; }
+    .plan-btn.outline { background: white; color: var(--text); border: 1px solid var(--border); }
+    .plan-btn.outline:hover { border-color: var(--accent); color: var(--accent); }
+    .features-divider { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 14px; }
+    .feature-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .feature-list li { font-size: 13px; display: flex; align-items: center; gap: 9px; }
+    .feature-list li .check { color: var(--accent); font-weight: 700; }
+    .feature-list li .cross { color: #d1d5db; }
+
+    /* COMPARE TABLE */
+    .compare-title { font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 24px; }
+    .compare-table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+    .compare-table th, .compare-table td { padding: 14px 20px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--border); }
+    .compare-table th { background: var(--bg); font-weight: 600; }
+    .compare-table td:not(:first-child) { text-align: center; }
+    .compare-table th:not(:first-child) { text-align: center; }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .check-icon { color: var(--accent); font-weight: 700; }
+    .cross-icon { color: #d1d5db; }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">Wav<span>o</span></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Main</div>
+    <a href="dashboard.html"><div class="sidebar-item"><span class="icon">🏠</span> Dashboard</div></a>
+    <a href="projects.html"><div class="sidebar-item"><span class="icon">📁</span> Projects</div></a>
+    <a href="agents.html"><div class="sidebar-item"><span class="icon">🤖</span> Agents <span class="badge">11</span></div></a>
+    <a href="pricing.html"><div class="sidebar-item active"><span class="icon">💳</span> Pricing</div></a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Activity</div>
+    <div class="sidebar-item"><span class="icon">📊</span> Analytics</div>
+    <div class="sidebar-item"><span class="icon">🔔</span> Notifications <span class="badge">3</span></div>
+    <div class="sidebar-item"><span class="icon">🕓</span> Activity Log</div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Account</div>
+    <a href="settings.html"><div class="sidebar-item"><span class="icon">⚙️</span> Settings</div></a>
+    <div class="sidebar-item"><span class="icon">🆘</span> Help & Support</div>
+    <a href="index.html"><div class="sidebar-item"><span class="icon">🚪</span> Sign out</div></a>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="user-row">
+      <div class="user-avatar">A</div>
+      <div><div class="user-name">Aryan</div><div class="user-plan">Pro Plan</div></div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Pricing & Plans</div>
+    <span class="current-plan">Current: Pro Plan</span>
+  </div>
+
+  <div class="content">
+    <div class="page-title">Simple, honest pricing.</div>
+    <div class="page-sub">No per-seat fees. No hidden charges. Cancel anytime.</div>
+
+    <div class="billing-toggle">
+      <span class="toggle-label">Monthly</span>
+      <div class="toggle-switch"></div>
+      <span class="toggle-label">Yearly</span>
+      <span class="save-badge">Save 30%</span>
+    </div>
+
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">$0 <span class="per">/ mo</span></div>
+        <div class="plan-tagline">Get started and explore what Wavo can do for your business.</div>
+        <button class="plan-btn outline">Downgrade</button>
+        <div class="features-divider">Includes</div>
+        <ul class="feature-list">
+          <li><span class="check">✓</span> 3 AI Agents</li>
+          <li><span class="check">✓</span> 1 Project</li>
+          <li><span class="check">✓</span> 100 agent tasks/mo</li>
+          <li><span class="check">✓</span> Gmail integration</li>
+          <li><span class="check">✓</span> Community support</li>
+          <li><span class="cross">✗</span> Custom instructions</li>
+          <li><span class="cross">✗</span> API access</li>
+        </ul>
+      </div>
+      <div class="pricing-card popular">
+        <div class="popular-badge">YOUR PLAN</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">$29 <span class="per">/ mo</span></div>
+        <div class="plan-tagline">For solo founders running a serious business with real volume.</div>
+        <button class="plan-btn current">Current plan</button>
+        <div class="features-divider">Everything in Free, plus</div>
+        <ul class="feature-list">
+          <li><span class="check">✓</span> All 11 AI Agents</li>
+          <li><span class="check">✓</span> Unlimited projects</li>
+          <li><span class="check">✓</span> 2,000 tasks/mo</li>
+          <li><span class="check">✓</span> All integrations</li>
+          <li><span class="check">✓</span> Priority support</li>
+          <li><span class="check">✓</span> Custom agent instructions</li>
+          <li><span class="cross">✗</span> API access</li>
+        </ul>
+      </div>
+      <div class="pricing-card">
+        <div class="plan-name">Scale</div>
+        <div class="plan-price">$79 <span class="per">/ mo</span></div>
+        <div class="plan-tagline">For high-volume businesses that need advanced control and API access.</div>
+        <button class="plan-btn upgrade">Upgrade to Scale</button>
+        <div class="features-divider">Everything in Pro, plus</div>
+        <ul class="feature-list">
+          <li><span class="check">✓</span> 10,000 tasks/mo</li>
+          <li><span class="check">✓</span> API access</li>
+          <li><span class="check">✓</span> Dedicated support</li>
+          <li><span class="check">✓</span> White-label option</li>
+          <li><span class="check">✓</span> Advanced analytics</li>
+          <li><span class="check">✓</span> Custom agent training</li>
+          <li><span class="check">✓</span> SLA guarantee</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="compare-title">Feature comparison</div>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Feature</th><th>Free</th><th>Pro</th><th>Scale</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>AI Agents</td><td>3</td><td>11</td><td>11</td></tr>
+        <tr><td>Projects</td><td>1</td><td>Unlimited</td><td>Unlimited</td></tr>
+        <tr><td>Agent tasks / month</td><td>100</td><td>2,000</td><td>10,000</td></tr>
+        <tr><td>Integrations</td><td>Gmail only</td><td>All</td><td>All</td></tr>
+        <tr><td>Custom instructions</td><td class="cross-icon">—</td><td class="check-icon">✓</td><td class="check-icon">✓</td></tr>
+        <tr><td>API access</td><td class="cross-icon">—</td><td class="cross-icon">—</td><td class="check-icon">✓</td></tr>
+        <tr><td>White-label</td><td class="cross-icon">—</td><td class="cross-icon">—</td><td class="check-icon">✓</td></tr>
+        <tr><td>Support</td><td>Community</td><td>Priority</td><td>Dedicated</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</body>
+</html>
