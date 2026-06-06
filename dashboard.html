@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wavo — Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f7f7f8; --surface: #ffffff; --border: #ebebeb;
+      --text: #1a1a1a; --muted: #888; --accent: #6c63ff;
+      --accent-light: #f0efff; --sidebar-w: 240px; --radius: 12px;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+    a { text-decoration: none; color: inherit; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar-w); background: white; border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; padding: 20px 0; position: fixed; top: 0; bottom: 0; left: 0; z-index: 10;
+    }
+    .sidebar-logo { padding: 4px 20px 20px; font-size: 18px; font-weight: 700; letter-spacing: -0.5px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+    .sidebar-logo span { color: var(--accent); }
+
+    .sidebar-section { padding: 0 12px; margin-bottom: 8px; }
+    .sidebar-label { font-size: 10px; font-weight: 600; letter-spacing: 1.2px; color: var(--muted); text-transform: uppercase; padding: 0 8px; margin-bottom: 4px; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px; padding: 9px 10px;
+      border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--muted);
+      cursor: pointer; transition: all 0.15s; margin-bottom: 2px;
+    }
+    .sidebar-item:hover { background: var(--bg); color: var(--text); }
+    .sidebar-item.active { background: var(--accent-light); color: var(--accent); }
+    .sidebar-item .icon { width: 18px; text-align: center; font-size: 14px; }
+    .sidebar-item .badge { margin-left: auto; background: var(--accent); color: white; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 999px; }
+
+    .sidebar-bottom { margin-top: auto; padding: 16px 12px 4px; border-top: 1px solid var(--border); }
+    .user-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; cursor: pointer; }
+    .user-row:hover { background: var(--bg); }
+    .user-avatar { width: 32px; height: 32px; background: var(--accent-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; color: var(--accent); flex-shrink: 0; }
+    .user-name { font-size: 13px; font-weight: 600; }
+    .user-plan { font-size: 11px; color: var(--muted); }
+
+    /* MAIN */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* TOP BAR */
+    .topbar { background: white; border-bottom: 1px solid var(--border); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 5; }
+    .topbar-title { font-size: 16px; font-weight: 600; }
+    .topbar-actions { display: flex; gap: 10px; align-items: center; }
+    .topbar-search { display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; font-size: 13px; color: var(--muted); }
+    .btn-new { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
+
+    /* CONTENT */
+    .content { padding: 32px; flex: 1; }
+    .greeting { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+    .greeting-sub { font-size: 14px; color: var(--muted); margin-bottom: 32px; }
+
+    /* STATS ROW */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+    .stat-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; }
+    .stat-label { font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 8px; }
+    .stat-val { font-size: 28px; font-weight: 700; letter-spacing: -1px; }
+    .stat-delta { font-size: 12px; color: #22c55e; margin-top: 4px; }
+    .stat-delta.neg { color: #ef4444; }
+
+    /* GRID BELOW STATS */
+    .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px; }
+    .card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .card-title { font-size: 14px; font-weight: 600; }
+    .card-link { font-size: 12px; color: var(--accent); font-weight: 500; cursor: pointer; }
+
+    /* ACTIVE AGENTS */
+    .agent-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .agent-row:last-child { border-bottom: none; }
+    .agent-icon-sm { width: 36px; height: 36px; background: var(--accent-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .agent-info { flex: 1; }
+    .agent-n { font-size: 13px; font-weight: 600; }
+    .agent-last { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .agent-status { font-size: 11px; padding: 3px 9px; border-radius: 999px; font-weight: 600; }
+    .agent-status.running { background: #dcfce7; color: #16a34a; }
+    .agent-status.idle { background: #f5f5f5; color: var(--muted); }
+    .agent-status.alert { background: #fef3c7; color: #d97706; }
+
+    /* ACTIVITY */
+    .activity-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+    .activity-text { font-size: 13px; line-height: 1.5; }
+    .activity-time { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* PROJECTS */
+    .projects-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .project-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; cursor: pointer; transition: all 0.2s; }
+    .project-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(108,99,255,0.08); }
+    .project-name { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .project-desc { font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+    .project-agents { display: flex; gap: 6px; flex-wrap: wrap; }
+    .project-agent-tag { font-size: 11px; background: var(--accent-light); color: var(--accent); padding: 3px 9px; border-radius: 999px; }
+    .project-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+    .project-updated { font-size: 11px; color: var(--muted); }
+    .project-tasks { font-size: 11px; font-weight: 600; color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">Wav<span>o</span></div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Main</div>
+    <a href="dashboard.html"><div class="sidebar-item active"><span class="icon">🏠</span> Dashboard</div></a>
+    <a href="projects.html"><div class="sidebar-item"><span class="icon">📁</span> Projects</div></a>
+    <a href="agents.html"><div class="sidebar-item"><span class="icon">🤖</span> Agents <span class="badge">11</span></div></a>
+    <a href="pricing.html"><div class="sidebar-item"><span class="icon">💳</span> Pricing</div></a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Activity</div>
+    <div class="sidebar-item"><span class="icon">📊</span> Analytics</div>
+    <div class="sidebar-item"><span class="icon">🔔</span> Notifications <span class="badge">3</span></div>
+    <div class="sidebar-item"><span class="icon">🕓</span> Activity Log</div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Account</div>
+    <a href="settings.html"><div class="sidebar-item"><span class="icon">⚙️</span> Settings</div></a>
+    <div class="sidebar-item"><span class="icon">🆘</span> Help & Support</div>
+    <a href="index.html"><div class="sidebar-item"><span class="icon">🚪</span> Sign out</div></a>
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="user-row">
+      <div class="user-avatar">A</div>
+      <div>
+        <div class="user-name">Aryan</div>
+        <div class="user-plan">Pro Plan</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Dashboard</div>
+    <div class="topbar-actions">
+      <div class="topbar-search">🔍 Search anything...</div>
+      <button class="btn-new" onclick="window.location.href='projects.html'">+ New Project</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="greeting">Good afternoon, Aryan 👋</div>
+    <div class="greeting-sub">Here's what your agents have been up to today.</div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Tasks completed today</div>
+        <div class="stat-val">148</div>
+        <div class="stat-delta">↑ 23 from yesterday</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Active agents</div>
+        <div class="stat-val">7</div>
+        <div class="stat-delta">4 idle</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Emails handled</div>
+        <div class="stat-val">34</div>
+        <div class="stat-delta">↑ 12 from yesterday</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Tasks remaining</div>
+        <div class="stat-val">22</div>
+        <div class="stat-delta neg">↑ 5 new added</div>
+      </div>
+    </div>
+
+    <!-- AGENTS + ACTIVITY -->
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Active Agents</div>
+          <a href="agents.html"><div class="card-link">View all →</div></a>
+        </div>
+        <div class="agent-row">
+          <div class="agent-icon-sm">📣</div>
+          <div class="agent-info"><div class="agent-n">Marketing Agent</div><div class="agent-last">Posted 3 LinkedIn updates · 2m ago</div></div>
+          <span class="agent-status running">Running</span>
+        </div>
+        <div class="agent-row">
+          <div class="agent-icon-sm">📧</div>
+          <div class="agent-info"><div class="agent-n">Email Agent</div><div class="agent-last">Replied to 8 emails · 14m ago</div></div>
+          <span class="agent-status running">Running</span>
+        </div>
+        <div class="agent-row">
+          <div class="agent-icon-sm">🤝</div>
+          <div class="agent-info"><div class="agent-n">Sales Agent</div><div class="agent-last">Followed up with 5 leads · 1h ago</div></div>
+          <span class="agent-status alert">Alert</span>
+        </div>
+        <div class="agent-row">
+          <div class="agent-icon-sm">✍️</div>
+          <div class="agent-info"><div class="agent-n">Content Agent</div><div class="agent-last">Draft ready for review · 3h ago</div></div>
+          <span class="agent-status idle">Idle</span>
+        </div>
+        <div class="agent-row">
+          <div class="agent-icon-sm">💰</div>
+          <div class="agent-info"><div class="agent-n">Finance Agent</div><div class="agent-last">Invoice sent to Client A · 5h ago</div></div>
+          <span class="agent-status idle">Idle</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Recent Activity</div>
+          <div class="card-link">See all</div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot"></div>
+          <div><div class="activity-text">Marketing Agent published a post on LinkedIn</div><div class="activity-time">2 minutes ago</div></div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot"></div>
+          <div><div class="activity-text">Email Agent drafted reply to Sarah from Acme</div><div class="activity-time">14 minutes ago</div></div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot"></div>
+          <div><div class="activity-text">Sales Agent flagged hot lead: Dario M.</div><div class="activity-time">45 minutes ago</div></div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot"></div>
+          <div><div class="activity-text">Research Agent completed market report</div><div class="activity-time">2 hours ago</div></div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot"></div>
+          <div><div class="activity-text">Finance Agent sent invoice #043 — $2,400</div><div class="activity-time">5 hours ago</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROJECTS -->
+    <div class="card-header" style="margin-bottom: 16px;">
+      <div class="card-title" style="font-size:15px;">Your Projects</div>
+      <a href="projects.html"><div class="card-link">View all →</div></a>
+    </div>
+    <div class="projects-row">
+      <div class="project-card" onclick="window.location.href='projects.html'">
+        <div class="project-name">Product Launch Q3</div>
+        <div class="project-desc">Full go-to-market campaign for the new SaaS product release in July.</div>
+        <div class="project-agents">
+          <span class="project-agent-tag">Marketing</span>
+          <span class="project-agent-tag">Content</span>
+          <span class="project-agent-tag">Sales</span>
+        </div>
+        <div class="project-footer">
+          <span class="project-updated">Updated 1h ago</span>
+          <span class="project-tasks">42 tasks</span>
+        </div>
+      </div>
+      <div class="project-card" onclick="window.location.href='projects.html'">
+        <div class="project-name">Client Onboarding</div>
+        <div class="project-desc">Automating the onboarding workflow for new consulting clients end-to-end.</div>
+        <div class="project-agents">
+          <span class="project-agent-tag">Ops</span>
+          <span class="project-agent-tag">Email</span>
+          <span class="project-agent-tag">Legal</span>
+        </div>
+        <div class="project-footer">
+          <span class="project-updated">Updated 3h ago</span>
+          <span class="project-tasks">18 tasks</span>
+        </div>
+      </div>
+      <div class="project-card" onclick="window.location.href='projects.html'">
+        <div class="project-name">Brand Refresh</div>
+        <div class="project-desc">Updating brand voice, visuals, and messaging across all channels.</div>
+        <div class="project-agents">
+          <span class="project-agent-tag">Brand</span>
+          <span class="project-agent-tag">Content</span>
+        </div>
+        <div class="project-footer">
+          <span class="project-updated">Updated yesterday</span>
+          <span class="project-tasks">9 tasks</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
