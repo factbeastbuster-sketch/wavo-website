@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wavo — Agents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #f7f7f8; --surface: #fff; --border: #ebebeb; --text: #1a1a1a; --muted: #888; --accent: #6c63ff; --accent-light: #f0efff; --sidebar-w: 240px; --radius: 12px; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+    a { text-decoration: none; color: inherit; }
+
+    .sidebar { width: var(--sidebar-w); background: white; border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px 0; position: fixed; top: 0; bottom: 0; left: 0; z-index: 10; }
+    .sidebar-logo { padding: 4px 20px 20px; font-size: 18px; font-weight: 700; letter-spacing: -0.5px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+    .sidebar-logo span { color: var(--accent); }
+    .sidebar-section { padding: 0 12px; margin-bottom: 8px; }
+    .sidebar-label { font-size: 10px; font-weight: 600; letter-spacing: 1.2px; color: var(--muted); text-transform: uppercase; padding: 0 8px; margin-bottom: 4px; }
+    .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.15s; margin-bottom: 2px; }
+    .sidebar-item:hover { background: var(--bg); color: var(--text); }
+    .sidebar-item.active { background: var(--accent-light); color: var(--accent); }
+    .sidebar-item .icon { width: 18px; text-align: center; font-size: 14px; }
+    .sidebar-item .badge { margin-left: auto; background: var(--accent); color: white; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 999px; }
+    .sidebar-bottom { margin-top: auto; padding: 16px 12px 4px; border-top: 1px solid var(--border); }
+    .user-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; cursor: pointer; }
+    .user-row:hover { background: var(--bg); }
+    .user-avatar { width: 32px; height: 32px; background: var(--accent-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; color: var(--accent); flex-shrink: 0; }
+    .user-name { font-size: 13px; font-weight: 600; }
+    .user-plan { font-size: 11px; color: var(--muted); }
+
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; }
+    .topbar { background: white; border-bottom: 1px solid var(--border); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 5; }
+    .topbar-title { font-size: 16px; font-weight: 600; }
+    .filter-row { display: flex; gap: 8px; }
+    .filter-btn { padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 500; border: 1px solid var(--border); background: white; cursor: pointer; color: var(--muted); font-family: inherit; transition: all 0.15s; }
+    .filter-btn.active, .filter-btn:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+
+    .content { padding: 32px; }
+    .page-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+    .page-sub { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+
+    .agents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    .agent-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; transition: all 0.2s; }
+    .agent-card:hover { border-color: var(--accent); box-shadow: 0 4px 20px rgba(108,99,255,0.08); transform: translateY(-2px); }
+    .agent-card-top { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+    .agent-icon { width: 46px; height: 46px; background: var(--accent-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .agent-name { font-size: 15px; font-weight: 700; }
+    .agent-tag-sm { font-size: 11px; background: var(--bg); color: var(--muted); padding: 2px 8px; border-radius: 999px; margin-top: 2px; display: inline-block; }
+    .agent-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 18px; }
+    .agent-card-footer { display: flex; align-items: center; justify-content: space-between; }
+    .agent-status-row { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .status-dot.on { background: #22c55e; }
+    .status-dot.off { background: #d1d5db; }
+    .status-dot.alert { background: #f59e0b; }
+    .toggle-btn { padding: 6px 14px; font-size: 12px; font-weight: 600; border-radius: 7px; border: none; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+    .toggle-btn.active { background: var(--accent-light); color: var(--accent); }
+    .toggle-btn.inactive { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
+    .configure-btn { font-size: 12px; color: var(--accent); cursor: pointer; font-weight: 500; }
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo">Wav<span>o</span></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Main</div>
+    <a href="dashboard.html"><div class="sidebar-item"><span class="icon">🏠</span> Dashboard</div></a>
+    <a href="projects.html"><div class="sidebar-item"><span class="icon">📁</span> Projects</div></a>
+    <a href="agents.html"><div class="sidebar-item active"><span class="icon">🤖</span> Agents <span class="badge">11</span></div></a>
+    <a href="pricing.html"><div class="sidebar-item"><span class="icon">💳</span> Pricing</div></a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Activity</div>
+    <div class="sidebar-item"><span class="icon">📊</span> Analytics</div>
+    <div class="sidebar-item"><span class="icon">🔔</span> Notifications <span class="badge">3</span></div>
+    <div class="sidebar-item"><span class="icon">🕓</span> Activity Log</div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Account</div>
+    <a href="settings.html"><div class="sidebar-item"><span class="icon">⚙️</span> Settings</div></a>
+    <div class="sidebar-item"><span class="icon">🆘</span> Help & Support</div>
+    <a href="index.html"><div class="sidebar-item"><span class="icon">🚪</span> Sign out</div></a>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="user-row">
+      <div class="user-avatar">A</div>
+      <div><div class="user-name">Aryan</div><div class="user-plan">Pro Plan</div></div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Agents</div>
+    <div class="filter-row">
+      <button class="filter-btn active">All</button>
+      <button class="filter-btn">Active</button>
+      <button class="filter-btn">Idle</button>
+      <button class="filter-btn">Growth</button>
+      <button class="filter-btn">Operations</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="page-title">Your AI Agents</div>
+    <div class="page-sub">11 specialized agents — each trained for a specific function of your business.</div>
+
+    <div class="agents-grid">
+      <!-- 11 agents -->
+      <div class="agent-card">
+        <div class="agent-card-top">
+          <div class="agent-icon">📣</div>
+          <div><div class="agent-name">Marketing Agent</div><span class="agent-tag-sm">Growth</span></div>
+        </div>
+        <div class="agent-desc">Creates campaigns, writes copy, schedules social posts, and tracks performance across all channels automatically.</div>
+        <div class="agent-card-footer">
+          <div class="agent-status-row"><div class="status-dot on"></div><span style="color:#22c55e;font-size:12px;font-weight:600;">Running</span></div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <span class="configure-btn">Configure</span>
+            <button class="toggle-btn active">Active</button>
+          </div>
+        </div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-card-top">
+          <div class="agent-icon">⚖️</div>
+          <div><div class="agent-name">Legal Agent</div><span class="agent-tag-sm">Compliance</span></div>
+        </div>
+        <div class="agent-desc">Drafts contracts, reviews terms, flags legal risks, and helps you stay compliant — without a lawyer on retainer.</div>
+        <div class="agent-card-footer">
+          <div class="agent-status-row"><div class="status-dot off"></div><span style="color:var(--muted);font-size:12px;">Idle</span></div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <span class="configure-btn">Configure</span>
+            <button class="toggle-btn inactive">Enable</button>
+          </div>
+        </div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-card-top">
+          <div class="agent-icon">💰</div>
+          <div><div class="agent-name">Finance Agent</div><span class="agent-tag-sm">Money</span></div>
+        </div>
+        <div class="agent-desc">Tracks expenses, generates invoices, monitors cash flow, and delivers clean financial snapshots on demand.</div>
+        <div class="agent-card-footer">
+          <div class="agent-status-row"><div class="status-dot on"></div><span style="color:#22c55e;font-size:12px;font-weight:600;">Running</span></div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <span class="configure-btn">Configure</span>
+            <button class="toggle-btn active">Active</button>
+          </div>
+        </div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-card-top">
+          <div class="agent-icon">🤝</div>
+          <div><div class="agent-name">Sales Agent</div><span class="agent-tag-sm">Revenue</span></div>
+        </div>
+        <div class="agent-desc">Qualifies leads, follows up with prospects, writes personalized outreach, and manages your entire pipeline.</div>
+        <div class="agent-card-footer">
+          <div class="agent-status-row"><div class="status-dot alert"></div><span style="color:#d97706;font-size:12px;font-weight:600;">Alert</span></div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <span class="configure-btn">Configure</span>
+            <button class="toggle-btn active">Active</button>
+          </div>
+        </div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-card-top">
+          <div class="agent-icon">💬</div>
+          <div><div class="agent-name">Support Agent</div><span class="agent-tag-sm">Customer</span></div>
+        </div>
+        <div class="agent-desc">Handles customer queries 24/7, resolves common issues, and escalates only what truly needs your attention.</div>
+        <div class="agent-card-footer">
+          <div class="agent-status-row"><div class="status-dot on"></div><span style="color:#22c55e;font-size:12px;font-weight:600;">Running</span></div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <span class="configure-btn">Configure</span>
+            <button class="toggle-btn active">Active</button>
+          </div>
+        </div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-card-top">
+          <div class="agent-icon">✍️</div>
+          <div><div class="agent-name">Content Agent</div><span class="agent-tag-sm">Content</span></div>
+        </div>
+        <div class="agent-desc">Writes blog posts, newsletters, LinkedIn articles, and threads — perfectly matched to your brand voice.</div>
+        <div class="agent-card-footer">
+          <div class="agent-status-row"><div class="status-dot off"></div><span style="color:var(--muted);font-size:12px;">Idle</span></div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <span class="configure-btn">Configure</span>
+            <button class="toggle-btn inactive">Enable</button>
+          </div>
+        </div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-card-top">
+          <div class="agent-icon">🔍</div>
+          <div><div class="agent-name">Research Agent</div><span class="agent-tag-sm">Intelligence</span></div>
+        </div>
+        <div class="agent-desc">Digs deep into competitors, markets, and trends — delivers clean, actionable summaries you can use immediately.</div>
+        <div class="agent-card-footer">
+          <div class="agent-status-row"><div class="status-dot off"></div><span style="color:var(--muted);font-size:12px;">Idle</span></div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <span class="configure-btn">Configure</span>
+            <button class="toggle-btn inactive">Enable</button>
+          </div>
+        </div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-card-top">
+          <div class="agent-icon">📅</div>
+          <div><div class="agent-name">Operations Agent</div><span class="agent-tag-sm">Ops</span></div>
+        </div>
+        <div class="agent-desc">Manages your schedule, builds SOPs, coordinates tasks, and keeps your whole business running smoothly.</div>
+        <div class="agent-card-footer">
+          <div class="agent-status-row"><div class="status-dot on"></div><span style="color:#22c55e;font-size:12px;font-weight:600;">Running</span></div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <span class="configure-btn">Configure</span>
+            <button class="toggle-btn active">Active</button>
+          </div>
+        </div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-card-top">
+          <div class="agent-icon">🎨</div>
+          <div><div class="agent-name">Brand Agent</div><span class="agent-tag-sm">Design</span></div>
+        </div>
+        <div class="agent-desc">Defines your brand voice, maintains consistency, generates visual briefs, and creates style guidelines.</div>
+        <div class="agent-card-footer">
+          <div class="agent-status-row"><div class="status-dot off"></div><span style="color:var(--muted);font-size:12px;">Idle</span></div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <span class="configure-btn">Configure</span>
+            <button class="toggle-btn inactive">Enable</button>
+          </div>
+        </div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-card-top">
+          <div class="agent-icon">📧</div>
+          <div><div class="agent-name">Email Agent</div><span class="agent-tag-sm">Inbox</span></div>
+        </div>
+        <div class="agent-desc">Manages your inbox, drafts replies, runs email sequences, and keeps all your communications sharp.</div>
+        <div class="agent-card-footer">
+          <div class="agent-status-row"><div class="status-dot on"></div><span style="color:#22c55e;font-size:12px;font-weight:600;">Running</span></div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <span class="configure-btn">Configure</span>
+            <button class="toggle-btn active">Active</button>
+          </div>
+        </div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-card-top">
+          <div class="agent-icon">📊</div>
+          <div><div class="agent-name">Analytics Agent</div><span class="agent-tag-sm">Data</span></div>
+        </div>
+        <div class="agent-desc">Tracks your KPIs, builds dashboards, spots anomalies, and tells you exactly what to focus on next.</div>
+        <div class="agent-card-footer">
+          <div class="agent-status-row"><div class="status-dot on"></div><span style="color:#22c55e;font-size:12px;font-weight:600;">Running</span></div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <span class="configure-btn">Configure</span>
+            <button class="toggle-btn active">Active</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
