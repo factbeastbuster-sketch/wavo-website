@@ -11,9 +11,11 @@
     body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
     a { text-decoration: none; color: inherit; }
 
-    .sidebar { width: var(--sidebar-w); background: white; border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px 0; position: fixed; top: 0; bottom: 0; left: 0; z-index: 10; }
-    .sidebar-logo { padding: 4px 20px 20px; font-size: 18px; font-weight: 700; letter-spacing: -0.5px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+    /* SIDEBAR */
+    .sidebar { width: var(--sidebar-w); background: white; border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px 0; position: fixed; top: 0; bottom: 0; left: 0; z-index: 100; transition: transform 0.3s; }
+    .sidebar-logo { padding: 4px 20px 20px; font-size: 18px; font-weight: 700; letter-spacing: -0.5px; border-bottom: 1px solid var(--border); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
     .sidebar-logo span { color: var(--accent); }
+    .sidebar-close { display: none; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--muted); }
     .sidebar-section { padding: 0 12px; margin-bottom: 8px; }
     .sidebar-label { font-size: 10px; font-weight: 600; letter-spacing: 1.2px; color: var(--muted); text-transform: uppercase; padding: 0 8px; margin-bottom: 4px; }
     .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.15s; margin-bottom: 2px; }
@@ -27,41 +29,59 @@
     .user-avatar { width: 32px; height: 32px; background: var(--accent-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; color: var(--accent); flex-shrink: 0; }
     .user-name { font-size: 13px; font-weight: 600; }
     .user-plan { font-size: 11px; color: var(--muted); }
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 90; }
 
-    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; }
-    .topbar { background: white; border-bottom: 1px solid var(--border); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 5; }
+    /* MAIN */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .topbar { background: white; border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 5; gap: 12px; }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .hamburger { display: none; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text); }
     .topbar-title { font-size: 16px; font-weight: 600; }
-    .filter-row { display: flex; gap: 8px; }
-    .filter-btn { padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 500; border: 1px solid var(--border); background: white; cursor: pointer; color: var(--muted); font-family: inherit; transition: all 0.15s; }
+    .filter-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .filter-btn { padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 500; border: 1px solid var(--border); background: white; cursor: pointer; color: var(--muted); font-family: inherit; transition: all 0.15s; }
     .filter-btn.active, .filter-btn:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
 
-    .content { padding: 32px; }
+    .content { padding: 24px; }
     .page-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
-    .page-sub { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+    .page-sub { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
 
-    .agents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-    .agent-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; transition: all 0.2s; }
+    .agents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .agent-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; transition: all 0.2s; }
     .agent-card:hover { border-color: var(--accent); box-shadow: 0 4px 20px rgba(108,99,255,0.08); transform: translateY(-2px); }
-    .agent-card-top { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
-    .agent-icon { width: 46px; height: 46px; background: var(--accent-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-    .agent-name { font-size: 15px; font-weight: 700; }
+    .agent-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .agent-icon { width: 44px; height: 44px; background: var(--accent-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .agent-name { font-size: 14px; font-weight: 700; }
     .agent-tag-sm { font-size: 11px; background: var(--bg); color: var(--muted); padding: 2px 8px; border-radius: 999px; margin-top: 2px; display: inline-block; }
-    .agent-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 18px; }
-    .agent-card-footer { display: flex; align-items: center; justify-content: space-between; }
+    .agent-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+    .agent-card-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
     .agent-status-row { display: flex; align-items: center; gap: 6px; font-size: 12px; }
     .status-dot { width: 7px; height: 7px; border-radius: 50%; }
     .status-dot.on { background: #22c55e; }
     .status-dot.off { background: #d1d5db; }
-    .status-dot.alert { background: #f59e0b; }
-    .toggle-btn { padding: 6px 14px; font-size: 12px; font-weight: 600; border-radius: 7px; border: none; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+    .btn-group { display: flex; gap: 8px; align-items: center; }
+    .chat-btn { padding: 6px 12px; font-size: 12px; font-weight: 600; border-radius: 7px; border: none; cursor: pointer; font-family: inherit; background: var(--accent); color: white; transition: all 0.15s; }
+    .chat-btn:hover { background: #5a52e0; }
+    .toggle-btn { padding: 6px 12px; font-size: 12px; font-weight: 600; border-radius: 7px; border: none; cursor: pointer; font-family: inherit; transition: all 0.15s; }
     .toggle-btn.active { background: var(--accent-light); color: var(--accent); }
     .toggle-btn.inactive { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
-    .configure-btn { font-size: 12px; color: var(--accent); cursor: pointer; font-weight: 500; }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-close { display: block; }
+      .overlay.show { display: block; }
+      .main { margin-left: 0; }
+      .hamburger { display: block; }
+      .content { padding: 16px; }
+      .filter-row { display: none; }
+      .agents-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
-<aside class="sidebar">
-  <div class="sidebar-logo">Wav<span>o</span></div>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">Wav<span>o</span><button class="sidebar-close" onclick="closeSidebar()">✕</button></div>
   <div class="sidebar-section">
     <div class="sidebar-label">Main</div>
     <a href="dashboard.html"><div class="sidebar-item"><span class="icon">🏠</span> Dashboard</div></a>
@@ -78,7 +98,6 @@
   <div class="sidebar-section">
     <div class="sidebar-label">Account</div>
     <a href="settings.html"><div class="sidebar-item"><span class="icon">⚙️</span> Settings</div></a>
-    <div class="sidebar-item"><span class="icon">🆘</span> Help & Support</div>
     <a href="index.html"><div class="sidebar-item"><span class="icon">🚪</span> Sign out</div></a>
   </div>
   <div class="sidebar-bottom">
@@ -91,178 +110,127 @@
 
 <div class="main">
   <div class="topbar">
-    <div class="topbar-title">Agents</div>
+    <div class="topbar-left">
+      <button class="hamburger" onclick="openSidebar()">☰</button>
+      <div class="topbar-title">Agents</div>
+    </div>
     <div class="filter-row">
       <button class="filter-btn active">All</button>
       <button class="filter-btn">Active</button>
       <button class="filter-btn">Idle</button>
-      <button class="filter-btn">Growth</button>
-      <button class="filter-btn">Operations</button>
     </div>
   </div>
-
   <div class="content">
     <div class="page-title">Your AI Agents</div>
     <div class="page-sub">11 specialized agents — each trained for a specific function of your business.</div>
-
     <div class="agents-grid">
-      <!-- 11 agents -->
+
       <div class="agent-card">
-        <div class="agent-card-top">
-          <div class="agent-icon">📣</div>
-          <div><div class="agent-name">Marketing Agent</div><span class="agent-tag-sm">Growth</span></div>
-        </div>
-        <div class="agent-desc">Creates campaigns, writes copy, schedules social posts, and tracks performance across all channels automatically.</div>
+        <div class="agent-card-top"><div class="agent-icon">📣</div><div><div class="agent-name">Marketing Agent</div><span class="agent-tag-sm">Growth</span></div></div>
+        <div class="agent-desc">Creates campaigns, writes copy, schedules social posts, and tracks performance across all channels.</div>
         <div class="agent-card-footer">
           <div class="agent-status-row"><div class="status-dot on"></div><span style="color:#22c55e;font-size:12px;font-weight:600;">Running</span></div>
-          <div style="display:flex;gap:10px;align-items:center;">
-            <span class="configure-btn">Configure</span>
-            <button class="toggle-btn active">Active</button>
-          </div>
+          <div class="btn-group"><a href="chat-marketing.html"><button class="chat-btn">💬 Chat</button></a><button class="toggle-btn active">Active</button></div>
         </div>
       </div>
+
       <div class="agent-card">
-        <div class="agent-card-top">
-          <div class="agent-icon">⚖️</div>
-          <div><div class="agent-name">Legal Agent</div><span class="agent-tag-sm">Compliance</span></div>
-        </div>
-        <div class="agent-desc">Drafts contracts, reviews terms, flags legal risks, and helps you stay compliant — without a lawyer on retainer.</div>
+        <div class="agent-card-top"><div class="agent-icon">⚖️</div><div><div class="agent-name">Legal Agent</div><span class="agent-tag-sm">Compliance</span></div></div>
+        <div class="agent-desc">Drafts contracts, reviews terms, flags legal risks, and helps you stay compliant.</div>
         <div class="agent-card-footer">
           <div class="agent-status-row"><div class="status-dot off"></div><span style="color:var(--muted);font-size:12px;">Idle</span></div>
-          <div style="display:flex;gap:10px;align-items:center;">
-            <span class="configure-btn">Configure</span>
-            <button class="toggle-btn inactive">Enable</button>
-          </div>
+          <div class="btn-group"><a href="chat-legal.html"><button class="chat-btn">💬 Chat</button></a><button class="toggle-btn inactive">Enable</button></div>
         </div>
       </div>
+
       <div class="agent-card">
-        <div class="agent-card-top">
-          <div class="agent-icon">💰</div>
-          <div><div class="agent-name">Finance Agent</div><span class="agent-tag-sm">Money</span></div>
-        </div>
-        <div class="agent-desc">Tracks expenses, generates invoices, monitors cash flow, and delivers clean financial snapshots on demand.</div>
+        <div class="agent-card-top"><div class="agent-icon">💰</div><div><div class="agent-name">Finance Agent</div><span class="agent-tag-sm">Money</span></div></div>
+        <div class="agent-desc">Tracks expenses, generates invoices, monitors cash flow, and delivers financial snapshots.</div>
         <div class="agent-card-footer">
           <div class="agent-status-row"><div class="status-dot on"></div><span style="color:#22c55e;font-size:12px;font-weight:600;">Running</span></div>
-          <div style="display:flex;gap:10px;align-items:center;">
-            <span class="configure-btn">Configure</span>
-            <button class="toggle-btn active">Active</button>
-          </div>
+          <div class="btn-group"><a href="chat-finance.html"><button class="chat-btn">💬 Chat</button></a><button class="toggle-btn active">Active</button></div>
         </div>
       </div>
+
       <div class="agent-card">
-        <div class="agent-card-top">
-          <div class="agent-icon">🤝</div>
-          <div><div class="agent-name">Sales Agent</div><span class="agent-tag-sm">Revenue</span></div>
-        </div>
-        <div class="agent-desc">Qualifies leads, follows up with prospects, writes personalized outreach, and manages your entire pipeline.</div>
-        <div class="agent-card-footer">
-          <div class="agent-status-row"><div class="status-dot alert"></div><span style="color:#d97706;font-size:12px;font-weight:600;">Alert</span></div>
-          <div style="display:flex;gap:10px;align-items:center;">
-            <span class="configure-btn">Configure</span>
-            <button class="toggle-btn active">Active</button>
-          </div>
-        </div>
-      </div>
-      <div class="agent-card">
-        <div class="agent-card-top">
-          <div class="agent-icon">💬</div>
-          <div><div class="agent-name">Support Agent</div><span class="agent-tag-sm">Customer</span></div>
-        </div>
-        <div class="agent-desc">Handles customer queries 24/7, resolves common issues, and escalates only what truly needs your attention.</div>
+        <div class="agent-card-top"><div class="agent-icon">🎯</div><div><div class="agent-name">Sales Agent</div><span class="agent-tag-sm">Revenue</span></div></div>
+        <div class="agent-desc">Writes cold outreach, creates follow-up sequences, qualifies leads, and coaches on closing deals.</div>
         <div class="agent-card-footer">
           <div class="agent-status-row"><div class="status-dot on"></div><span style="color:#22c55e;font-size:12px;font-weight:600;">Running</span></div>
-          <div style="display:flex;gap:10px;align-items:center;">
-            <span class="configure-btn">Configure</span>
-            <button class="toggle-btn active">Active</button>
-          </div>
+          <div class="btn-group"><a href="chat-sales.html"><button class="chat-btn">💬 Chat</button></a><button class="toggle-btn active">Active</button></div>
         </div>
       </div>
+
       <div class="agent-card">
-        <div class="agent-card-top">
-          <div class="agent-icon">✍️</div>
-          <div><div class="agent-name">Content Agent</div><span class="agent-tag-sm">Content</span></div>
-        </div>
-        <div class="agent-desc">Writes blog posts, newsletters, LinkedIn articles, and threads — perfectly matched to your brand voice.</div>
+        <div class="agent-card-top"><div class="agent-icon">🎧</div><div><div class="agent-name">Support Agent</div><span class="agent-tag-sm">Customer</span></div></div>
+        <div class="agent-desc">Writes support templates, resolves complaints, creates FAQ docs, and crafts retention strategies.</div>
         <div class="agent-card-footer">
           <div class="agent-status-row"><div class="status-dot off"></div><span style="color:var(--muted);font-size:12px;">Idle</span></div>
-          <div style="display:flex;gap:10px;align-items:center;">
-            <span class="configure-btn">Configure</span>
-            <button class="toggle-btn inactive">Enable</button>
-          </div>
+          <div class="btn-group"><a href="chat-support.html"><button class="chat-btn">💬 Chat</button></a><button class="toggle-btn inactive">Enable</button></div>
         </div>
       </div>
+
       <div class="agent-card">
-        <div class="agent-card-top">
-          <div class="agent-icon">🔍</div>
-          <div><div class="agent-name">Research Agent</div><span class="agent-tag-sm">Intelligence</span></div>
+        <div class="agent-card-top"><div class="agent-icon">✍️</div><div><div class="agent-name">Content Agent</div><span class="agent-tag-sm">Creative</span></div></div>
+        <div class="agent-desc">Writes blogs, LinkedIn posts, Twitter threads, newsletters, and YouTube scripts on demand.</div>
+        <div class="agent-card-footer">
+          <div class="agent-status-row"><div class="status-dot on"></div><span style="color:#22c55e;font-size:12px;font-weight:600;">Running</span></div>
+          <div class="btn-group"><a href="chat-content.html"><button class="chat-btn">💬 Chat</button></a><button class="toggle-btn active">Active</button></div>
         </div>
-        <div class="agent-desc">Digs deep into competitors, markets, and trends — delivers clean, actionable summaries you can use immediately.</div>
+      </div>
+
+      <div class="agent-card">
+        <div class="agent-card-top"><div class="agent-icon">🔬</div><div><div class="agent-name">Research Agent</div><span class="agent-tag-sm">Intel</span></div></div>
+        <div class="agent-desc">Researches competitors, analyzes markets, summarizes trends, and delivers clean reports.</div>
         <div class="agent-card-footer">
           <div class="agent-status-row"><div class="status-dot off"></div><span style="color:var(--muted);font-size:12px;">Idle</span></div>
-          <div style="display:flex;gap:10px;align-items:center;">
-            <span class="configure-btn">Configure</span>
-            <button class="toggle-btn inactive">Enable</button>
-          </div>
+          <div class="btn-group"><a href="chat-research.html"><button class="chat-btn">💬 Chat</button></a><button class="toggle-btn inactive">Enable</button></div>
         </div>
       </div>
+
       <div class="agent-card">
-        <div class="agent-card-top">
-          <div class="agent-icon">📅</div>
-          <div><div class="agent-name">Operations Agent</div><span class="agent-tag-sm">Ops</span></div>
-        </div>
-        <div class="agent-desc">Manages your schedule, builds SOPs, coordinates tasks, and keeps your whole business running smoothly.</div>
+        <div class="agent-card-top"><div class="agent-icon">⚙️</div><div><div class="agent-name">Operations Agent</div><span class="agent-tag-sm">Efficiency</span></div></div>
+        <div class="agent-desc">Builds SOPs, creates workflow templates, suggests automation tools, and organizes processes.</div>
         <div class="agent-card-footer">
           <div class="agent-status-row"><div class="status-dot on"></div><span style="color:#22c55e;font-size:12px;font-weight:600;">Running</span></div>
-          <div style="display:flex;gap:10px;align-items:center;">
-            <span class="configure-btn">Configure</span>
-            <button class="toggle-btn active">Active</button>
-          </div>
+          <div class="btn-group"><a href="chat-operations.html"><button class="chat-btn">💬 Chat</button></a><button class="toggle-btn active">Active</button></div>
         </div>
       </div>
+
       <div class="agent-card">
-        <div class="agent-card-top">
-          <div class="agent-icon">🎨</div>
-          <div><div class="agent-name">Brand Agent</div><span class="agent-tag-sm">Design</span></div>
-        </div>
-        <div class="agent-desc">Defines your brand voice, maintains consistency, generates visual briefs, and creates style guidelines.</div>
+        <div class="agent-card-top"><div class="agent-icon">🎨</div><div><div class="agent-name">Brand Agent</div><span class="agent-tag-sm">Identity</span></div></div>
+        <div class="agent-desc">Defines brand voice, creates style guides, names products, writes taglines.</div>
         <div class="agent-card-footer">
           <div class="agent-status-row"><div class="status-dot off"></div><span style="color:var(--muted);font-size:12px;">Idle</span></div>
-          <div style="display:flex;gap:10px;align-items:center;">
-            <span class="configure-btn">Configure</span>
-            <button class="toggle-btn inactive">Enable</button>
-          </div>
+          <div class="btn-group"><a href="chat-brand.html"><button class="chat-btn">💬 Chat</button></a><button class="toggle-btn inactive">Enable</button></div>
         </div>
       </div>
+
       <div class="agent-card">
-        <div class="agent-card-top">
-          <div class="agent-icon">📧</div>
-          <div><div class="agent-name">Email Agent</div><span class="agent-tag-sm">Inbox</span></div>
-        </div>
-        <div class="agent-desc">Manages your inbox, drafts replies, runs email sequences, and keeps all your communications sharp.</div>
+        <div class="agent-card-top"><div class="agent-icon">📧</div><div><div class="agent-name">Email Agent</div><span class="agent-tag-sm">Inbox</span></div></div>
+        <div class="agent-desc">Drafts replies, writes cold emails, builds drip campaigns, and suggests killer subject lines.</div>
         <div class="agent-card-footer">
           <div class="agent-status-row"><div class="status-dot on"></div><span style="color:#22c55e;font-size:12px;font-weight:600;">Running</span></div>
-          <div style="display:flex;gap:10px;align-items:center;">
-            <span class="configure-btn">Configure</span>
-            <button class="toggle-btn active">Active</button>
-          </div>
+          <div class="btn-group"><a href="chat-email.html"><button class="chat-btn">💬 Chat</button></a><button class="toggle-btn active">Active</button></div>
         </div>
       </div>
+
       <div class="agent-card">
-        <div class="agent-card-top">
-          <div class="agent-icon">📊</div>
-          <div><div class="agent-name">Analytics Agent</div><span class="agent-tag-sm">Data</span></div>
-        </div>
-        <div class="agent-desc">Tracks your KPIs, builds dashboards, spots anomalies, and tells you exactly what to focus on next.</div>
+        <div class="agent-card-top"><div class="agent-icon">📊</div><div><div class="agent-name">Analytics Agent</div><span class="agent-tag-sm">Data</span></div></div>
+        <div class="agent-desc">Interprets metrics, builds KPI frameworks, spots trends, and turns data into clear actions.</div>
         <div class="agent-card-footer">
-          <div class="agent-status-row"><div class="status-dot on"></div><span style="color:#22c55e;font-size:12px;font-weight:600;">Running</span></div>
-          <div style="display:flex;gap:10px;align-items:center;">
-            <span class="configure-btn">Configure</span>
-            <button class="toggle-btn active">Active</button>
-          </div>
+          <div class="agent-status-row"><div class="status-dot off"></div><span style="color:var(--muted);font-size:12px;">Idle</span></div>
+          <div class="btn-group"><a href="chat-analytics.html"><button class="chat-btn">💬 Chat</button></a><button class="toggle-btn inactive">Enable</button></div>
         </div>
       </div>
+
     </div>
   </div>
 </div>
+
+<script>
+  function openSidebar() { document.getElementById('sidebar').classList.add('open'); document.getElementById('overlay').classList.add('show'); }
+  function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
+</script>
 </body>
 </html>
